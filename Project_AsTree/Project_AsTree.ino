@@ -15,7 +15,7 @@ float airTemp = 0;
 
 float moistVal1 = 0;
 int moist2_sen1 = A1;
-int moistVal2 = 0;
+float moistVal2 = 0;
 int pump1 = 9;
 int pump2 = 6;
 char incoming_value = 0;
@@ -39,7 +39,16 @@ float getMoisture1() {
     delay(1);
   }
   val = val / 200;
-  return val;
+  float dry = 700;
+  float percentDry = (val - 400) / dry;
+  float percentWet = 0.905 - percentDry;
+  return percentWet;
+}
+
+float getMoisture2(){
+  float rawVal = analogRead(moist2_sen1);
+  float calcVal = rawVal / 950;
+  return calcVal;
 }
 
 // Controlling pumps from serial input
@@ -90,13 +99,12 @@ void autoWater() {
 
 // Printing to client
 void printString(){
-  Serial.println(String(moistVal2) + "," + humidity + "%," + airTemp + "°C," + moistVal1 + "|");
+  Serial.println(String(moistVal2) + "," + humidity + "," + airTemp + "," + moistVal1 + "|");
 }
 
 void loop() {
   moistVal1 = getMoisture1();
-  delay(100);
-  moistVal2 = analogRead(moist2_sen1);
+  moistVal2 = getMoisture2();
   humidity = dht.readHumidity();
   airTemp = dht.readTemperature();
 
