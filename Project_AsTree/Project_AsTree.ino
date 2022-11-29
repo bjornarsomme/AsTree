@@ -1,4 +1,3 @@
-
 #include "DHT.h"
 #define DHTPIN A0
 #define DHTTYPE DHT11
@@ -31,7 +30,7 @@ void setup() {
   digitalWrite(pump1, PUMP_OFF);
 }
 
-// Getting the moisture value for seconde station
+// Getting moisture percentage
 float getMoisture1() {
   float val = 0;
   for (int i = 0; i <= 100; i++) {
@@ -42,9 +41,10 @@ float getMoisture1() {
   float dry = 700;
   float percentDry = (val - 400) / dry;
   float percentWet = 0.905 - percentDry;
-  return percentWet;
+  return percentWet / 2;
 }
 
+// Getting moisture percentage
 float getMoisture2(){
   float rawVal = analogRead(moist2_sen1);
   float calcVal = rawVal / 950;
@@ -81,7 +81,7 @@ void controlPumps(char input) {
 // Auto watering based on system status and monitored conditions
 void autoWater() {
   if (Watering1) {
-    if (moistVal2 > 200) {
+    if (moistVal2 > 0.5) {
       digitalWrite(pump1, PUMP_OFF);
     } else {
       digitalWrite(pump1, PUMP_ON);
@@ -89,7 +89,7 @@ void autoWater() {
   }
 
   if (Watering2) {
-    if (moistVal1 < 700) {
+    if (moistVal1 > 0.5) {
       digitalWrite(pump2, PUMP_OFF);
     } else {
       digitalWrite(pump2, PUMP_ON);
